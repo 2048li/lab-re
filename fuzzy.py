@@ -757,6 +757,21 @@ def concolic_test(testfunc, maxiter = 100, verbose = 0):
     ##   such as if that variable turns out to be irrelevant to
     ##   the overall constraint, so be sure to preserve values
     ##   from the initial input (concrete_values).
+## insert exercise3 code
+    tmpconstrs = []
+    for  (c, caller) in zip(cur_path_constr, cur_path_constr_callers):
+      constrs = tmpconstrs + [sym_not(c)]
+      tmpconstrs.append(c)
+      ca = sym_and(*constrs)
+      if ca not in checked:
+         (ok, model) = fork_and_check(ca)
+         checked.add(ca)
+         if ok == z3.sat:
+           new_values = concrete_values.copy()
+           new_values.update(model)
+           inputs.add(new_values, caller)
+
+
 
   if verbose > 0:
     print 'Stopping after', iter, 'iterations'
